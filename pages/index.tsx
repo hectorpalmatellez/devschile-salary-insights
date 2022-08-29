@@ -1,16 +1,61 @@
 import type { NextPage } from 'next';
+import { useState } from 'react';
 import Head from 'next/head';
 import styles from '../styles/Home.module.css';
-import { Answer, Gender } from './types/Answer';
+import { Answer, Gender } from '../types/Answer';
 
 interface Props {
   data: Array<Answer>;
-  men: Array<Answer>;
-  women: Array<Answer>;
-  other: Array<Answer>;
 }
 
-const Home: NextPage<Props> = ({ data, men, women, other }) => {
+const Home: NextPage<Props> = ({ data }) => {
+  const roles: Array<string> = Array.from(
+    new Set(
+      data.map(
+        (answer) =>
+          answer[
+            '¿Cuál es el rol que cumples actualmente en tu trabajo remunerado?'
+          ]
+      )
+    )
+  );
+  const orderedByAge = (answers: Array<Answer>) => {
+    const ranges = Array.from(
+      new Set(answers.map((answer) => answer['¿Cuál es tu rango de edad?']))
+    );
+    return Object.assign(
+      ranges.map((range) => {
+        return {
+          [range]: answers.filter(
+            (answer) => answer['¿Cuál es tu rango de edad?'] === range
+          ),
+        };
+      }),
+      {}
+    );
+  };
+
+  const changeRole = (role: string) => {
+    setFilteredData(
+      data.filter(
+        (answer) =>
+          answer[
+            '¿Cuál es el rol que cumples actualmente en tu trabajo remunerado?'
+          ] === role
+      )
+    );
+  };
+
+  const [currentRole, setCurrentRole] = useState('Desarrollador Front-end');
+  const [filteredData, setFilteredData] = useState(data);
+  const filterByGender = (gender: Gender) =>
+    filteredData!.filter(
+      (answer: Answer) => answer['¿Cuál es tu género?'] === gender
+    );
+  const men = filterByGender('Hombre');
+  const women = filterByGender('Mujer');
+  const other = filterByGender('Otro');
+
   return (
     <div className={styles.container}>
       <Head>
@@ -20,10 +65,38 @@ const Home: NextPage<Props> = ({ data, men, women, other }) => {
       </Head>
 
       <main className={styles.main}>
-        <div>Encontramos {data.length} fronts.</div>
+        {roles.map((role) => (
+          <button
+            key={role}
+            onClick={() => {
+              changeRole(role);
+              setCurrentRole(role);
+            }}
+          >
+            {role}
+          </button>
+        ))}
         <div>
-          De estos, {men.length} son hombres, {women.length} son mujeres y{' '}
-          {other.length} se identifican con <code>Otro</code>
+          Encontramos {data.length} respuestas. De estas, {filteredData.length}{' '}
+          son {currentRole}.
+        </div>
+        <div>
+          De estos, {men.length} son hombres, {women.length} son mujeres
+          {other.length ? (
+            <span>
+              y {other.length} se identifican con <code>Otro</code>
+            </span>
+          ) : null}
+          .
+        </div>
+        <div>
+          {orderedByAge(filteredData).map((answer, index) => (
+            <div key={index}>
+              Para el rango {Object.keys(orderedByAge(filteredData)[index])} hay{' '}
+              {orderedByAge(filteredData)[index][Object.keys(answer)[0]].length}{' '}
+              personas.
+            </div>
+          ))}
         </div>
       </main>
 
@@ -35,25 +108,15 @@ const Home: NextPage<Props> = ({ data, men, women, other }) => {
 export default Home;
 export async function getServerSideProps() {
   const frontURL = new URL(
-    '/api/front',
+    '/api/answers',
     process.env.NEXT_PUBLIC_SERVER_URL as string
   ).href;
   const response = await fetch(frontURL);
   const data: Array<Answer> = await response.json();
 
-  const filterByGender = (gender: Gender) =>
-    data.filter((answer) => answer['¿Cuál es tu género?'] === gender);
-
-  const men = filterByGender('Hombre');
-  const women = filterByGender('Mujer');
-  const other = filterByGender('Otro');
-
   return {
     props: {
       data,
-      men,
-      women,
-      other,
     },
   };
 }

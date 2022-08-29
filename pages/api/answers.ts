@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import axios from 'axios';
-import { Answer } from '../types/Answer';
+import { Answer } from '../../types/Answer';
 
 export default async function handler(
   req: NextApiRequest,
