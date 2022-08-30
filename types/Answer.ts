@@ -17,7 +17,7 @@ type RangeOfExperience =
   | '2 años a 5 años'
   | '6 años a 10 años'
   | 'más de 11 años';
-type Roles =
+export type Role =
   | 'Desarrollador Front-end'
   | 'Desarrollador Back-end'
   | 'Desarrollador Full-stack'
@@ -30,7 +30,7 @@ type Roles =
   | 'SysAdmin'
   | 'DevOps'
   | 'CTO/CEO/CFO/COO';
-type SalaryRanges =
+type SalaryRange =
   | 'Entre $2.501.000 a $3.000.000'
   | 'Entre $2.001.000 a $2.500.000'
   | 'Más de $3.000.000'
@@ -49,7 +49,7 @@ export interface Answer {
   [q.education]: EducationLevel;
   [q.languages]: AnotherLanguage;
   [q.yearsExperience]: RangeOfExperience;
-  [q.experienceRoles]: Array<Roles>;
-  [q.currentRole]: Roles;
-  [q.salary]: SalaryRanges;
+  [q.experienceRoles]: Array<Role>;
+  [q.currentRole]: Role;
+  [q.salary]: SalaryRange;
 }
