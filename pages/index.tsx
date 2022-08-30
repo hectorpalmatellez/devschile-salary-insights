@@ -47,7 +47,13 @@ const Home: NextPage<Props> = ({ data }) => {
   };
 
   const [currentRole, setCurrentRole] = useState('Desarrollador Front-end');
-  const [filteredData, setFilteredData] = useState(data);
+  const initialData = data.filter(
+    (answer) =>
+      answer[
+        '¿Cuál es el rol que cumples actualmente en tu trabajo remunerado?'
+      ] === currentRole
+  );
+  const [filteredData, setFilteredData] = useState(initialData);
   const filterByGender = (gender: Gender) =>
     filteredData!.filter(
       (answer: Answer) => answer['¿Cuál es tu género?'] === gender
@@ -68,6 +74,7 @@ const Home: NextPage<Props> = ({ data }) => {
         {roles.map((role) => (
           <button
             key={role}
+            className={role === currentRole ? 'active' : ''}
             onClick={() => {
               changeRole(role);
               setCurrentRole(role);
@@ -76,15 +83,16 @@ const Home: NextPage<Props> = ({ data }) => {
             {role}
           </button>
         ))}
+        <div>Tenemos {data.length} respuestas totales.</div>
         <div>
-          Encontramos {data.length} respuestas. De estas, {filteredData.length}{' '}
-          son {currentRole}.
+          De estas, {filteredData.length} son <code>{currentRole}</code>.
         </div>
         <div>
           De estos, {men.length} son hombres, {women.length} son mujeres
           {other.length ? (
             <span>
-              y {other.length} se identifican con <code>Otro</code>
+              &nbsp;y {other.length} se identifica{other.length > 1 ? 'n' : ''}{' '}
+              con <code>Otro</code>
             </span>
           ) : null}
           .
