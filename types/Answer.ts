@@ -1,3 +1,5 @@
+import { Questions as q } from '../constants/questions';
+
 export type Gender = 'Hombre' | 'Mujer' | 'Otro';
 type RangeOfAge = '18 a 24' | '25 a 34' | '35 a 44' | '45 a 54';
 type DidBootcamp = 'Si completo' | 'Si incompleto' | 'No';
@@ -38,16 +40,16 @@ type SalaryRanges =
   | 'Entre $501.000 a $1.000.000';
 
 export interface Answer {
-  'Submission ID': string;
-  'Respondent ID': string;
-  'Submitted at': Date;
-  '¿Cuál es tu género?': Gender;
-  '¿Cuál es tu rango de edad?': RangeOfAge;
-  '¿Estudiaste en un bootcamp?': DidBootcamp;
-  '¿Cuál es el máximo nivel educacional que llegaste?': EducationLevel;
-  '¿Dominas otro idioma hablado/escrito aparte del español?': AnotherLanguage;
-  '¿Hace cuántos años estás trabajando en tecnología?': RangeOfExperience;
-  '¿Cuáles son las funciones que has realizado en tu vida profesional?': Array<Roles>;
-  '¿Cuál es el rol que cumples actualmente en tu trabajo remunerado?': Roles;
-  '¿Cuál es tu nivel de ingreso liquido mensual en tu trabajo actual?': SalaryRanges;
+  [q.id]: string;
+  [q.user]: string;
+  [q.submission]: Date;
+  [q.gender]: Gender;
+  [q.ageRange]: RangeOfAge;
+  [q.bootcamp]: DidBootcamp;
+  [q.education]: EducationLevel;
+  [q.languages]: AnotherLanguage;
+  [q.yearsExperience]: RangeOfExperience;
+  [q.experienceRoles]: Array<Roles>;
+  [q.currentRole]: Roles;
+  [q.salary]: SalaryRanges;
 }

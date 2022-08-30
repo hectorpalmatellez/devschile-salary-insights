@@ -1,8 +1,10 @@
 import type { NextPage } from 'next';
 import { useState } from 'react';
 import Head from 'next/head';
+
 import styles from '../styles/Home.module.css';
 import { Answer, Gender } from '../types/Answer';
+import { Questions as q } from '../constants/questions';
 
 interface Props {
   data: Array<Answer>;
@@ -10,25 +12,16 @@ interface Props {
 
 const Home: NextPage<Props> = ({ data }) => {
   const roles: Array<string> = Array.from(
-    new Set(
-      data.map(
-        (answer) =>
-          answer[
-            '¿Cuál es el rol que cumples actualmente en tu trabajo remunerado?'
-          ]
-      )
-    )
+    new Set(data.map((answer) => answer[q.currentRole]))
   );
   const orderedByAge = (answers: Array<Answer>) => {
     const ranges = Array.from(
-      new Set(answers.map((answer) => answer['¿Cuál es tu rango de edad?']))
+      new Set(answers.map((answer) => answer[q.ageRange]))
     );
     return Object.assign(
       ranges.map((range) => {
         return {
-          [range]: answers.filter(
-            (answer) => answer['¿Cuál es tu rango de edad?'] === range
-          ),
+          [range]: answers.filter((answer) => answer[q.ageRange] === range),
         };
       }),
       {}
@@ -36,28 +29,16 @@ const Home: NextPage<Props> = ({ data }) => {
   };
 
   const changeRole = (role: string) => {
-    setFilteredData(
-      data.filter(
-        (answer) =>
-          answer[
-            '¿Cuál es el rol que cumples actualmente en tu trabajo remunerado?'
-          ] === role
-      )
-    );
+    setFilteredData(data.filter((answer) => answer[q.currentRole] === role));
   };
 
   const [currentRole, setCurrentRole] = useState('Desarrollador Front-end');
   const initialData = data.filter(
-    (answer) =>
-      answer[
-        '¿Cuál es el rol que cumples actualmente en tu trabajo remunerado?'
-      ] === currentRole
+    (answer) => answer[q.currentRole] === currentRole
   );
   const [filteredData, setFilteredData] = useState(initialData);
   const filterByGender = (gender: Gender) =>
-    filteredData!.filter(
-      (answer: Answer) => answer['¿Cuál es tu género?'] === gender
-    );
+    filteredData!.filter((answer: Answer) => answer[q.gender] === gender);
   const men = filterByGender('Hombre');
   const women = filterByGender('Mujer');
   const other = filterByGender('Otro');
