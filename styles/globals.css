@@ -27,3 +27,7 @@ a {
 button.active {
   color: red;
 }
+
+small {
+  font-size: 8px;
+}
