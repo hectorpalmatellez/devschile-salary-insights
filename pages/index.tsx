@@ -3,10 +3,11 @@ import Head from 'next/head';
 import { useEffect, useState } from 'react';
 import { EChartsOption } from 'echarts-for-react/lib/types';
 
-import { Answer, Gender, Role } from '../types/Answer';
+import Charts from '../components/Charts';
+import { Answer, Role } from '../types/Answer';
 import { Questions as q } from '../constants/questions';
 import styles from '../styles/Home.module.css';
-import Charts from '../components/Charts';
+import { useGenders } from '../hooks/useGenders';
 
 interface Props {
   data: Array<Answer>;
@@ -23,29 +24,14 @@ const Home: NextPage<Props> = ({ data }) => {
     (answer) => answer[q.currentRole] === currentRole
   );
   const [filteredData, setFilteredData] = useState(initialData);
-  const filterByGender = (gender: Gender) =>
-    filteredData!.filter((answer: Answer) => answer[q.gender] === gender);
-  const men = filterByGender('Hombre');
-  const women = filterByGender('Mujer');
-  const other = filterByGender('Otro');
-  const orderedByAge = (answers: Array<Answer>) => {
-    const ranges = Array.from(
-      new Set(answers.map((answer) => answer[q.ageRange]))
-    );
-    return Object.assign(
-      ranges.map((range) => {
-        return {
-          [range]: answers.filter((answer) => answer[q.ageRange] === range),
-        };
-      }),
-      {}
-    );
-  };
-  const [genderChartOptions, setGenderChartOptions] = useState<EChartsOption>();
+  const { men, women, other } = useGenders(filteredData);
 
-  const changeRole = (role: string) => {
+  const [genderChartOptions, setGenderChartOptions] = useState<EChartsOption>();
+  const [ageChartOptions, setAgeChartOptions] = useState<EChartsOption>();
+
+  const changeRole = (role: string) =>
     setFilteredData(data.filter((answer) => answer[q.currentRole] === role));
-  };
+
   const updatedGenderChart = () => {
     const data = [
       { value: men.length, name: 'Hombres' },
@@ -71,9 +57,46 @@ const Home: NextPage<Props> = ({ data }) => {
       ],
     };
   };
+  const updatedAgeChart = () => {
+    const orderedByAge = (answers: Array<Answer>) => {
+      const ranges = Array.from(
+        new Set(answers.map((answer) => answer[q.ageRange]))
+      );
+      return Object.assign(
+        ranges.map((range) => {
+          return {
+            [range]: answers.filter((answer) => answer[q.ageRange] === range),
+          };
+        }),
+        {}
+      );
+    };
+    const data = orderedByAge(filteredData).map((answer, index) => ({
+      name: Object.keys(orderedByAge(filteredData)[index])[0],
+      value: orderedByAge(filteredData)[index][Object.keys(answer)[0]].length,
+    }));
+
+    return {
+      tooltip: {
+        trigger: 'item',
+      },
+      legend: {
+        orient: 'vertical',
+        left: 'left',
+      },
+      series: [
+        {
+          type: 'pie',
+          radius: '50%',
+          data,
+        },
+      ],
+    };
+  };
 
   useEffect(() => {
     setGenderChartOptions(updatedGenderChart);
+    setAgeChartOptions(updatedAgeChart);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentRole]);
 
@@ -113,15 +136,11 @@ const Home: NextPage<Props> = ({ data }) => {
           ) : null}
           .
         </div>
-        <div>
-          {orderedByAge(filteredData).map((answer, index) => (
-            <div key={index}>
-              Para el rango {Object.keys(orderedByAge(filteredData)[index])} hay{' '}
-              {orderedByAge(filteredData)[index][Object.keys(answer)[0]].length}{' '}
-              personas.
-            </div>
-          ))}
+        <div style={{ width: '50%' }}>
+          <br />
+          <br />
           {genderChartOptions && <Charts chartData={genderChartOptions} />}
+          {ageChartOptions && <Charts chartData={ageChartOptions} />}
         </div>
       </main>
 
