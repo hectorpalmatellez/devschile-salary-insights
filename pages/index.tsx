@@ -41,49 +41,34 @@ const Home: NextPage<Props> = ({ data }) => {
       {}
     );
   };
-  const defaultChartData: EChartsOption = {
-    grid: { top: 8, right: 8, bottom: 24, left: 36 },
-    xAxis: {
-      type: 'category',
-      data: ['Hombre', 'Mujer', 'Otro'],
-    },
-    yAxis: {
-      type: 'value',
-    },
-    series: [
-      {
-        data: [men.length, women.length, other.length],
-        type: 'bar',
-        smooth: true,
-      },
-    ],
-  };
-  const [chartOptions, setChartOptions] = useState(defaultChartData);
+  const [chartOptions, setChartOptions] = useState();
 
   const changeRole = (role: string) => {
     setFilteredData(data.filter((answer) => answer[q.currentRole] === role));
   };
   const updatedChart = () => {
+    const data = [
+      { value: men.length, name: 'Hombres' },
+      { value: women.length, name: 'Mujeres' },
+    ];
+    if (other.length) {
+      data.push({ value: other.length, name: 'Otro' });
+    }
     return {
-      grid: { top: 8, right: 8, bottom: 24, left: 36 },
-      xAxis: {
-        type: 'category',
-        data: ['Hombre', 'Mujer', 'Otro'],
+      tooltip: {
+        trigger: 'item',
       },
-      yAxis: {
-        type: 'value',
+      legend: {
+        orient: 'vertical',
+        left: 'left',
       },
       series: [
         {
-          data: [men.length, women.length, other.length],
-          type: 'bar',
-          showBackground: true,
-          smooth: true,
+          type: 'pie',
+          radius: '50%',
+          data,
         },
       ],
-      tooltip: {
-        trigger: 'axis',
-      },
     };
   };
 
@@ -134,7 +119,7 @@ const Home: NextPage<Props> = ({ data }) => {
               personas.
             </div>
           ))}
-          <ReactECharts option={chartOptions} lazyUpdate={true} />
+          {chartOptions && <ReactECharts option={chartOptions} />}
         </div>
       </main>
 
