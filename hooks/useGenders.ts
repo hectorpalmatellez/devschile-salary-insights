@@ -1,4 +1,3 @@
-import React from 'react';
 import { Answer, Gender } from '../types/Answer';
 import { Questions as q } from '../constants/questions';
 

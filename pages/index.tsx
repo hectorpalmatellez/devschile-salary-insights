@@ -8,15 +8,13 @@ import { Answer, Role } from '../types/Answer';
 import { Questions as q } from '../constants/questions';
 import styles from '../styles/Home.module.css';
 import { useGenders } from '../hooks/useGenders';
+import { useRoles } from '../hooks/useRoles';
 
 interface Props {
   data: Array<Answer>;
 }
 
 const Home: NextPage<Props> = ({ data }) => {
-  const roles: Array<Role> = Array.from(
-    new Set(data.map((answer) => answer[q.currentRole]))
-  );
   const [currentRole, setCurrentRole] = useState<Role>(
     'Desarrollador Front-end'
   );
@@ -25,6 +23,7 @@ const Home: NextPage<Props> = ({ data }) => {
   );
   const [filteredData, setFilteredData] = useState(initialData);
   const { men, women, other } = useGenders(filteredData);
+  const { roles } = useRoles(data);
 
   const [genderChartOptions, setGenderChartOptions] = useState<EChartsOption>();
   const [ageChartOptions, setAgeChartOptions] = useState<EChartsOption>();
@@ -41,6 +40,10 @@ const Home: NextPage<Props> = ({ data }) => {
       data.push({ value: other.length, name: 'Otro' });
     }
     return {
+      title: {
+        text: 'Distribución por género',
+        left: 'center',
+      },
       tooltip: {
         trigger: 'item',
       },
@@ -77,6 +80,10 @@ const Home: NextPage<Props> = ({ data }) => {
     }));
 
     return {
+      title: {
+        text: 'Distribución por rango de edad',
+        left: 'center',
+      },
       tooltip: {
         trigger: 'item',
       },
@@ -125,13 +132,19 @@ const Home: NextPage<Props> = ({ data }) => {
         </div>
         <div>
           Hay {filteredData.length} <code>{currentRole}</code>.
+          <br />
+          <br />
         </div>
 
-        <div style={{ width: '50%' }}>
-          <br />
-          <br />
-          {genderChartOptions && <Charts chartData={genderChartOptions} />}
-          {ageChartOptions && <Charts chartData={ageChartOptions} />}
+        <div style={{ display: 'flex', width: '100%' }}>
+          <div style={{ width: '50%' }}>
+            <br />
+            {genderChartOptions && <Charts chartData={genderChartOptions} />}
+          </div>
+          <div style={{ width: '50%' }}>
+            <br />
+            {ageChartOptions && <Charts chartData={ageChartOptions} />}
+          </div>
         </div>
       </main>
 
