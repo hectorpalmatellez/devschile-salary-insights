@@ -126,16 +126,7 @@ const Home: NextPage<Props> = ({ data }) => {
         <div>
           Hay {filteredData.length} <code>{currentRole}</code>.
         </div>
-        <div>
-          De estos, {men.length} son hombres, {women.length} son mujeres
-          {other.length ? (
-            <span>
-              &nbsp;y {other.length} se identifica{other.length > 1 ? 'n' : ''}{' '}
-              con <code>Otro</code>
-            </span>
-          ) : null}
-          .
-        </div>
+
         <div style={{ width: '50%' }}>
           <br />
           <br />
