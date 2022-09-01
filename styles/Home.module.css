@@ -25,6 +25,10 @@
   align-items: center;
 }
 
+.chartContainer {
+  flex: 50%;
+}
+
 .title a {
   color: #0070f3;
   text-decoration: none;

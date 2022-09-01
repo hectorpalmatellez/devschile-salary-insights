@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { EChartsOption } from 'echarts-for-react/lib/types';
 
 import Charts from '../components/Charts';
-import { Answer, Role } from '../types/Answer';
+import { Answer, Role, SalaryRange, salaryRangeIndex } from '../types/Answer';
 import { Questions as q } from '../constants/questions';
 import styles from '../styles/Home.module.css';
 import { useGenders } from '../hooks/useGenders';
@@ -27,6 +27,7 @@ const Home: NextPage<Props> = ({ data }) => {
 
   const [genderChartOptions, setGenderChartOptions] = useState<EChartsOption>();
   const [ageChartOptions, setAgeChartOptions] = useState<EChartsOption>();
+  const [salaryRangeOptions, setSalaryRangeOptions] = useState<EChartsOption>();
 
   const changeRole = (role: string) =>
     setFilteredData(data.filter((answer) => answer[q.currentRole] === role));
@@ -100,10 +101,82 @@ const Home: NextPage<Props> = ({ data }) => {
       ],
     };
   };
+  const orderSalariesAsc = (
+    salariesList: Array<SalaryRange>
+  ): Array<SalaryRange> => {
+    return salariesList.sort(
+      (a, b) => salaryRangeIndex(a) - salaryRangeIndex(b)
+    );
+  };
+  const updatedSalariesChart = () => {
+    const ranges = orderSalariesAsc(
+      Array.from(new Set(filteredData.map((answer) => answer[q.salary])))
+    );
+    const salaries = Array.from(
+      new Set(
+        filteredData.map((answer) => {
+          return {
+            name: answer[q.yearsExperience],
+            value: answer[q.salary],
+          };
+        })
+      )
+    );
+
+    const values = ranges.map((range: SalaryRange) => {
+      return {
+        name: range,
+        value: salaries.filter((salary) => salary.value === range).length,
+      };
+    });
+
+    return {
+      title: {
+        text: 'Distribución por sueldo (CLP/mes)',
+        left: 'center',
+      },
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: {
+          type: 'cross',
+          label: {
+            backgroundColor: '#6a7985',
+          },
+        },
+      },
+      legend: {
+        orient: 'vertical',
+        left: 'left',
+      },
+      xAxis: {
+        type: 'category',
+        boundaryGap: false,
+        data: ranges,
+      },
+      yAxis: {
+        type: 'value',
+      },
+      series: [
+        {
+          type: 'line',
+          data: values,
+          focus: 'series',
+          stack: 'Total',
+        },
+        // {
+        //   type: 'line',
+        //   focus: 'series',
+        //   stack: 'Total',
+        //   data: expRanges,
+        // },
+      ],
+    };
+  };
 
   useEffect(() => {
     setGenderChartOptions(updatedGenderChart);
     setAgeChartOptions(updatedAgeChart);
+    setSalaryRangeOptions(updatedSalariesChart);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentRole]);
 
@@ -136,14 +209,17 @@ const Home: NextPage<Props> = ({ data }) => {
           <br />
         </div>
 
-        <div style={{ display: 'flex', width: '100%' }}>
-          <div style={{ width: '50%' }}>
+        <div style={{ display: 'flex', flexFlow: 'row wrap', width: '100%' }}>
+          <div className={styles.chartContainer}>
             <br />
             {genderChartOptions && <Charts chartData={genderChartOptions} />}
           </div>
-          <div style={{ width: '50%' }}>
+          <div className={styles.chartContainer}>
             <br />
             {ageChartOptions && <Charts chartData={ageChartOptions} />}
+          </div>
+          <div className={styles.chartContainer}>
+            {salaryRangeOptions && <Charts chartData={salaryRangeOptions} />}
           </div>
         </div>
       </main>

@@ -30,7 +30,7 @@ export type Role =
   | 'SysAdmin'
   | 'DevOps'
   | 'CTO/CEO/CFO/COO';
-type SalaryRange =
+export type SalaryRange =
   | 'Entre $2.501.000 a $3.000.000'
   | 'Entre $2.001.000 a $2.500.000'
   | 'Más de $3.000.000'
@@ -38,6 +38,27 @@ type SalaryRange =
   | 'Entre $1.501.000 a $1.800.000'
   | 'Entre $1.801.000 a $2.000.000'
   | 'Entre $501.000 a $1.000.000';
+
+export const salaryRangeIndex = (range: SalaryRange): number => {
+  switch (range) {
+    case 'Entre $501.000 a $1.000.000':
+      return 1;
+    case 'Entre $1.001.000 a $1.500.000':
+      return 2;
+    case 'Entre $1.501.000 a $1.800.000':
+      return 3;
+    case 'Entre $1.801.000 a $2.000.000':
+      return 4;
+    case 'Entre $2.001.000 a $2.500.000':
+      return 5;
+    case 'Entre $2.501.000 a $3.000.000':
+      return 6;
+    case 'Más de $3.000.000':
+      return 7;
+    default:
+      return 'a';
+  }
+};
 
 export interface Answer {
   [q.id]: string;
